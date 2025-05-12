@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -16,29 +17,63 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
+// Function prototypes
+void keyboardInput(GLFWwindow *window);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos); // Add this line
 float cubeVertices[] = {
-    // back face
-    -0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
-     // front face
-     -0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,  0.5f,
-      0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f, -0.5f,  0.5f,
-      // left face
-      -0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
-      -0.5f, -0.5f, -0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f,
-      // right face
-       0.5f,  0.5f,  0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f, -0.5f,
-       0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,  0.5f,
-       // bottom face
-       -0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,
-        0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f,
-        // top face
-        -0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f
+    // positions           // normals
+    -0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,
+     0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,
+     0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,
+     0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,
+    -0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,
+    -0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,
+
+    -0.5f, -0.5f,  0.5f,   0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,   0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,   0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,   0.0f,  0.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,   0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,   0.0f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f,  0.5f,  -1.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  -1.0f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  -1.0f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  -1.0f,  0.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  -1.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  -1.0f,  0.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,   1.0f,  0.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,   1.0f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,   1.0f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,   1.0f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,   1.0f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,   1.0f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,   0.0f, -1.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,   0.0f, -1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,   0.0f, -1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,   0.0f, -1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,   0.0f, -1.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,   0.0f, -1.0f, 0.0f,
+
+    -0.5f,  0.5f, -0.5f,   0.0f, 1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,   0.0f, 1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,   0.0f, 1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,   0.0f, 1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,   0.0f, 1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,   0.0f, 1.0f, 0.0f
 };
+
 
 // Function prototypes
 void keyboardInput(GLFWwindow *window);
+void mouseInput(GLFWwindow* window);
+
+// Define lastFrame globally 
+float lastFrame = 0.0f;
+
+Camera camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 
 int main( void )
 {
@@ -75,6 +110,10 @@ int main( void )
     }
     glfwMakeContextCurrent(window);
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+
+
     // Initialize GLEW
     glewExperimental = true; // Needed for core profile
     if (glewInit() != GLEW_OK) {
@@ -83,7 +122,15 @@ int main( void )
         glfwTerminate();
         return -1;
     }
+
     unsigned int shaderProgram = LoadShaders("vertexShader.glsl", "fragmentShader.glsl");
+
+    // Lighting uniform locations
+    unsigned int lightDirLoc = glGetUniformLocation(shaderProgram, "lightDir");
+    unsigned int lightColorLoc = glGetUniformLocation(shaderProgram, "lightColor");
+    unsigned int objectColorLoc = glGetUniformLocation(shaderProgram, "objectColor");
+
+
     unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
 
     unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
@@ -95,6 +142,13 @@ int main( void )
 
     // Send them to the shader (only needs to be done once if static)
     glUseProgram(shaderProgram);
+
+    // Light direction and colors
+    glUniform3f(lightDirLoc, -0.2f, -1.0f, -0.3f);  // example direction
+    glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);   // white light
+    glUniform3f(objectColorLoc, 1.0f, 0.0f, 0.0f);  // red cube
+
+
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -114,8 +168,17 @@ int main( void )
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    // normal attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+
+
+   
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -130,12 +193,24 @@ int main( void )
     // Render loop
     while (!glfwWindowShouldClose(window))
     {
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+			glfwSetWindowShouldClose(window, true); //end the program if escape is pressed
+
         // Get inputs
-        keyboardInput(window);
-        
+		keyboardInput(window);// Call keyboard input function to update camera position
+		mouseInput(window); // Call mouse input function to update camera angles
+		camera.updateCameraVectors();// Update camera vectors based on yaw and pitch angles
+
+
         // Clear the window
         glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  //Proper clearing
+
+        // Update camera view matrix
+        glm::mat4 view = camera.getViewMatrix();  // Get the updated view matrix
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));  // Send the updated view matrix to the shader
+
+
         
         
         //draws the cube
@@ -155,6 +230,14 @@ int main( void )
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        // scaled cube
+        glm::mat4 model3 = glm::mat4(1.0f);
+        model3 = glm::translate(model3, glm::vec3(-1.5f, 0.0f, 0.0f)); // move it to the left
+        model3 = glm::scale(model3, glm::vec3(0.5f, 0.5f, 0.5f));      // scale it to half size
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model3));
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
         glBindVertexArray(0);
 
         // Swap buffers
@@ -162,13 +245,49 @@ int main( void )
         glfwPollEvents();
     }
     
+    //Re-enable mouse cursor before closing
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
     return 0;
 }
 
-void keyboardInput(GLFWwindow *window)
+void keyboardInput(GLFWwindow* window) {
+    float currentFrame = glfwGetTime();
+    float deltaTime = currentFrame - lastFrame;  // Calculate time between frames
+    lastFrame = currentFrame;
+    camera.processKeyboard(window, deltaTime);  // Update camera movement based on deltaTime
+
+}
+
+
+void mouseInput(GLFWwindow* window)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+    static bool firstMouse = true;
+    static double lastX = 1024.0 / 2.0;
+    static double lastY = 768.0 / 2.0;
+
+    double xPos, yPos;
+    glfwGetCursorPos(window, &xPos, &yPos);
+
+    if (firstMouse)
+    {
+        lastX = xPos;
+        lastY = yPos;
+        firstMouse = false;
+        return; // Skip the first frame to avoid jump
+    }
+
+    float xOffset = static_cast<float>(xPos - lastX);
+    float yOffset = static_cast<float>(lastY - yPos); // y reversed
+
+    lastX = xPos;
+    lastY = yPos;
+
+    float sensitivity = 0.1f; // adjust to control speed
+    xOffset *= sensitivity;
+    yOffset *= sensitivity;
+
+    camera.processMouseMovement(xOffset, yOffset);
 }
