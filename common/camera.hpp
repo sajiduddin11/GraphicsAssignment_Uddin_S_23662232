@@ -38,6 +38,10 @@ public:
     float zoom;
 
     void calculateCameraVectors();
+
+    bool isThirdPerson = false; // toggle flag
+    glm::mat4 getThirdPersonViewMatrix(glm::vec3 target);
+
 };
 
 #endif

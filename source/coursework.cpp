@@ -19,7 +19,7 @@
 
 // Function prototypes
 void keyboardInput(GLFWwindow *window);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos); // Add this line
+
 float cubeVertices[] = {
     // positions           // normals
     -0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,
@@ -104,7 +104,6 @@ int main( void )
     
     if( window == NULL ){
         fprintf(stderr, "Failed to open GLFW window.\n");
-        getchar();
         glfwTerminate();
         return -1;
     }
@@ -118,7 +117,6 @@ int main( void )
     glewExperimental = true; // Needed for core profile
     if (glewInit() != GLEW_OK) {
         fprintf(stderr, "Failed to initialize GLEW\n");
-        getchar();
         glfwTerminate();
         return -1;
     }
@@ -201,21 +199,42 @@ int main( void )
 		mouseInput(window); // Call mouse input function to update camera angles
 		camera.updateCameraVectors();// Update camera vectors based on yaw and pitch angles
 
+        // Toggle between first-person and third-person with 'C'
+        static bool cPressedLastFrame = false;
+        bool cPressedThisFrame = glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS;
+        if (cPressedThisFrame && !cPressedLastFrame) {
+            camera.isThirdPerson = !camera.isThirdPerson;
+        }
+        cPressedLastFrame = cPressedThisFrame;
+
 
         // Clear the window
         glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  //Proper clearing
 
         // Update camera view matrix
-        glm::mat4 view = camera.getViewMatrix();  // Get the updated view matrix
+        glm::mat4 view;
+        if (camera.isThirdPerson) {
+            glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f); // You can change this to follow an object
+            view = camera.getThirdPersonViewMatrix(target);
+        }
+        else {
+            view = camera.getViewMatrix();
+        }
+
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));  // Send the updated view matrix to the shader
 
 
         
         
         //draws the cube
-		glUseProgram(shaderProgram); // Use our custom shader and draw the cube every frame, This keeps the object on screen and updates it if anything changes
+		glUseProgram(shaderProgram); // Use custom shader and draw the cube every frame, This keeps the object on screen and updates it if anything changes
 
+        // Send camera position to shader for specular lighting
+        glm::vec3 camPos = camera.position;
+        int viewPosLoc = glGetUniformLocation(shaderProgram, "viewPos");
+        glUniform3f(viewPosLoc, camPos.x, camPos.y, camPos.z);
+ 
 		glBindVertexArray(VAO);
 
         // rotating cube
@@ -285,7 +304,7 @@ void mouseInput(GLFWwindow* window)
     lastX = xPos;
     lastY = yPos;
 
-    float sensitivity = 0.1f; // adjust to control speed
+    float sensitivity = 0.4f; // adjust to control speed
     xOffset *= sensitivity;
     yOffset *= sensitivity;
 

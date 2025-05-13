@@ -77,3 +77,10 @@ void Camera::calculateCameraVectors()
     right = glm::normalize(glm::cross(front, worldUp));
     up = glm::cross(right, front);
 }
+
+glm::mat4 Camera::getThirdPersonViewMatrix(glm::vec3 target)
+{
+    glm::vec3 offset = glm::vec3(0.0f, 2.0f, 6.0f); // height & distance behind player
+    glm::vec3 camPos = target - front * offset.z + glm::vec3(0.0f, offset.y, 0.0f);
+    return glm::lookAt(camPos, target, worldUp);
+}
